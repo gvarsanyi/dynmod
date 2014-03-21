@@ -17,7 +17,7 @@ read = (pkg, version, callback) ->
   catch err
     callback err
 
-module.exports.require = (pkg, version, callback) ->
+module.exports.require = module.exports = (pkg, version, callback) ->
   if typeof version is 'function'
     callback = version
     version = false
@@ -93,7 +93,35 @@ module.exports.install = (pkg, version, callback) ->
     version = latest_version
     install()
 
+list_all = (callback) ->
+  errors = []
+  count = 0
+  total = null
+  dict  = {}
+
+  fs.readdir dir, (err, pkgs) ->
+    return callback(err, {}) if err or not pkgs.length
+    total = pkgs.length
+    dict[pkg] = null for pkg in pkgs
+    for pkg in pkgs
+      do (pkg) ->
+        module.exports.list pkg, (err, versions) ->
+          if err
+            errors.push err
+            delete dict[pkg]
+          else unless versions and versions.length
+            delete dict[pkg]
+          else
+            dict[pkg] = versions
+          count += 1
+          if count is total
+            return callback(errors) if errors.length
+            callback null, dict
+
 module.exports.list = (pkg, callback) ->
+  return list_all(pkg) if typeof pkg is 'function'
+  return list_all(callback) unless pkg
+
   fs.exists dir + '/' + pkg, (exists) ->
     return callback(null, false) unless exists
     fs.readdir dir + '/' + pkg, (err, versions) ->
@@ -107,6 +135,6 @@ module.exports.current = (pkg, callback) ->
   cmd = 'npm show ' + pkg + ' version 2> /dev/null'
   child_process.exec cmd, (err, stdout, stderr) ->
     return callback(err) if err
-    latest_version = stdout.replace /^\s+|\s+$/g, '' # trim
+    current = stdout.replace /^\s+|\s+$/g, '' # trim
     module.exports.list pkg, (err, versions) ->
-      callback null, latest_version, versions and latest_version in versions
+      callback null, current, versions and current in versions, versions

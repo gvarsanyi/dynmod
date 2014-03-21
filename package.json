@@ -1,13 +1,13 @@
 {
   "name": "dynmod",
-  "version": "0.2.0",
+  "version": "0.3.1",
   "description": "Asynchronous npm module loader (e.g. async replacement for the 'require' command for npm packages) with auto-install support",
-  "main": "dynmod.js",
+  "main": "js/dynmod.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "bin": {
-    "dynmod": "./dynmod-cli.js"
+    "dynmod": "./js/dynmod-cli.js"
   },
   "repository": {
     "type": "git",

@@ -19,7 +19,7 @@ Handles multiple versions of npm packages, so despite being system-wide, so your
 # API
 - require('dynmod').**require**(npm_module_name[, version], function callback(err, module) {});
 - require('dynmod').**remove**(npm_module_name, version, function callback(err) {});
-- require('dynmod').**installedVersions**(npm_module_name, function callback(err, versions) {});
+- require('dynmod').**list**(npm_module_name, function callback(err, versions) {});
 
 # Examples
 ## Code requires latest (or most current locally installed version) of ExpressJS
@@ -43,8 +43,8 @@ Handles multiple versions of npm packages, so despite being system-wide, so your
 ### Install a specific version of express
     dynmod install express 3.5.0
 
-### List installed versions of express
-    dynmod list express
-
 ### Remove an installed version of express
     dynmod remove express 3.5.0
+
+### List installed versions of express
+    dynmod list express
