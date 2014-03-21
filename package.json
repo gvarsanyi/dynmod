@@ -1,0 +1,34 @@
+{
+  "name": "dynmod",
+  "version": "0.2.0",
+  "description": "Asynchronous npm module loader (e.g. async replacement for the 'require' command for npm packages) with auto-install support",
+  "main": "dynmod.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bin": {
+    "dynmod": "./dynmod-cli.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/gvarsanyi/dynmod.git"
+  },
+  "keywords": [
+    "dynamic",
+    "module",
+    "loader",
+    "async",
+    "asynchronous",
+    "require",
+    "npm",
+    "package",
+    "autoinstall",
+    "auto-install"
+  ],
+  "author": "Greg Varsanyi",
+  "license": "GNU GPLv2",
+  "bugs": {
+    "url": "https://github.com/gvarsanyi/dynmod/issues"
+  },
+  "homepage": "https://github.com/gvarsanyi/dynmod"
+}
