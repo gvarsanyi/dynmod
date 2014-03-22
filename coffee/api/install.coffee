@@ -36,3 +36,5 @@ module.exports = (spec, callback) ->
     return callback(err) if err
     version = latest_version
     install()
+
+module.exports.sync = (spec) ->

@@ -22,3 +22,5 @@ module.exports = (spec, callback) ->
       return callback() if err or (files and files.length)
       child_process.exec 'rm -rf ' + dir + '/' + pkg, (err) ->
         callback()
+
+module.exports.sync = (spec) ->

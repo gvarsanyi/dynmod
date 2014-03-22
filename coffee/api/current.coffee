@@ -12,3 +12,5 @@ module.exports = (pkg, callback) ->
       callback null, current, versions and current in versions, versions
 
 module.exports.cache = {}
+
+module.exports.sync = (spec) ->

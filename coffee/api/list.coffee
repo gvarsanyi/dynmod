@@ -17,3 +17,5 @@ module.exports = (pkg, callback) ->
       if versions and versions.length
         current.cache[pkg] = versions[versions.length - 1]
       callback null, versions
+
+module.exports.sync = (spec) ->

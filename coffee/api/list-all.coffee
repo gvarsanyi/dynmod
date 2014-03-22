@@ -28,3 +28,5 @@ module.exports = (callback) ->
           if count is total
             return callback(errors) if errors.length
             callback null, dict
+
+module.exports.sync = (spec) ->
