@@ -14,8 +14,7 @@
     case 'i':
     case 'install':
       pkg = process.argv[3] || error(new Error('no module specified'));
-      version = process.argv[4] || false;
-      dynmod.install(pkg, version, function(err) {
+      dynmod.install(pkg, function(err) {
         if (err) {
           return error(err);
         }
@@ -26,8 +25,7 @@
     case 'rm':
     case 'remove':
       pkg = process.argv[3] || error(new Error('no module specified'));
-      version = process.argv[4] || error(new Error('no version specified'));
-      dynmod.remove(pkg, version, function(err) {
+      dynmod.remove(pkg, function(err) {
         if (err) {
           return error(err);
         }
@@ -36,26 +34,29 @@
     case 'll':
     case 'ls':
     case 'list':
-      pkg = process.argv[3] || null;
-      dynmod.list(pkg, function(err, versions) {
-        var ver, _results;
-        if (err) {
-          return error(err);
-        }
-        if (pkg) {
-          if (!versions || (versions && !versions.length)) {
-            return console.log(pkg + ' is not installed');
+      if (pkg = process.argv[3]) {
+        dynmod.list(pkg, function(err, versions) {
+          if (err) {
+            return error(err);
           }
-          return console.log(pkg + ': ' + versions.join(', '));
-        } else {
+          if (pkg) {
+            if (!versions || (versions && !versions.length)) {
+              return console.log(pkg + ' is not installed');
+            }
+            return console.log(pkg + ': ' + versions.join(', '));
+          }
+        });
+      } else {
+        dynmod.listAll(function(err, versions) {
+          var ver, _results;
           _results = [];
           for (pkg in versions) {
             ver = versions[pkg];
             _results.push(console.log(pkg + ': ' + ver.join(', ')));
           }
           return _results;
-        }
-      });
+        });
+      }
       break;
     case 'c':
     case 'cur':
@@ -95,7 +96,7 @@
     case 'test':
       pkg = process.argv[3] || error(new Error('missing module'));
       version = process.argv[4] || false;
-      dynmod(pkg, version, function(err, mod) {
+      dynmod(pkg, function(err, mod) {
         if (err) {
           return error(err);
         }
@@ -103,7 +104,7 @@
       });
       break;
     default:
-      error(new Error('Invalid command. Usage:\n' + '\ndynmod [command] module [version]\n\n' + 'Commands: install (i), remove (rm, del, delete), list ' + '(ls, ll)\n'));
+      error(new Error('Invalid command. Usage:\n' + '\ndynmod [command] module[@version]\n\n' + 'Commands: install (i), remove (rm, del, delete), list ' + '(ls, ll)\n'));
   }
 
 }).call(this);
