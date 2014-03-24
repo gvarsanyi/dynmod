@@ -1,7 +1,6 @@
 fs = require 'fs'
 
-dir  = require './dir'
-list = require './list'
+dir = require '../dir'
 
 
 module.exports = (callback) ->
@@ -11,12 +10,12 @@ module.exports = (callback) ->
   dict  = {}
 
   fs.readdir dir, (err, pkgs) ->
-    return callback(err, {}) if err or not pkgs.length
+    return callback(err, dict) if err or not pkgs.length
     total = pkgs.length
     dict[pkg] = null for pkg in pkgs
     for pkg in pkgs
       do (pkg) ->
-        list pkg, (err, versions) ->
+        require('./list') pkg, (err, versions) ->
           if err
             errors.push err
             delete dict[pkg]
@@ -29,4 +28,11 @@ module.exports = (callback) ->
             return callback(errors) if errors.length
             callback null, dict
 
-module.exports.sync = (spec) ->
+module.exports.sync = ->
+  dict = {}
+  pkgs = fs.readdirSync dir
+  return dict unless pkgs.length
+  for pkg in pkgs
+    versions = require('./list').sync pkg
+    dict[pkg] = versions if versions and versions.length
+  dict

@@ -1,7 +1,8 @@
 fs   = require 'fs'
 util = require 'util'
 
-dir     = require './dir'
+cache   = require '../cache'
+dir     = require '../dir'
 install = require './install'
 list    = require './list'
 
@@ -14,14 +15,14 @@ err_msg = '%s is partially installed (possibly being installed by an other pr' +
 module.exports = (spec, callback) ->
   [pkg, version] = spec.split '@'
 
-  if mod = cache[pkg]?[version or currents[pkg]]?
+  if mod = cache.pkg[pkg]?[version or currents[pkg]]?
     return callback null, mod
 
   read = ->
     try
       path = dir + '/' + pkg + '/' + version + '/node_modules/' + pkg
       mod = require path
-      (cache[pkg] ?= {})[version] = mod
+      (cache.pkg[pkg] ?= {})[version] = mod
       callback null, mod
     catch err
       callback err
@@ -38,9 +39,9 @@ module.exports = (spec, callback) ->
         version = versions.pop()
         verify_version()
       else
-        install pkg, (err, version) ->
+        install pkg, (err, _version) ->
           return callback(err) if err
-          version = versions.pop()
+          version = _version
           verify_version()
     else if version in versions
       verify_version()
@@ -49,12 +50,10 @@ module.exports = (spec, callback) ->
         return callback(err) if err
         verify_version()
 
-module.exports.cache = cache = {}
-
 module.exports.sync = (spec) ->
   [pkg, version] = spec.split '@'
 
-  return mod if mod = cache[pkg]?[version or currents[pkg]]?
+  return mod if mod = cache.pkg[pkg]?[version or currents[pkg]]?
 
   versions = list.sync pkg
   unless version

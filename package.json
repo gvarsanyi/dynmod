@@ -1,6 +1,6 @@
 {
   "name": "dynmod",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Asynchronous npm module loader (e.g. async replacement for the 'require' command for npm packages) with auto-install support",
   "main": "js/dynmod.js",
   "scripts": {
@@ -31,5 +31,7 @@
     "url": "https://github.com/gvarsanyi/dynmod/issues"
   },
   "homepage": "https://github.com/gvarsanyi/dynmod",
-  "dependencies": {}
+  "dependencies": {
+    "sync-exec": "^0.3.0"
+  }
 }
