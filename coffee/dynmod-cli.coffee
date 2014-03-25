@@ -49,12 +49,12 @@ switch process.argv[2]
           console.log binaries[bin]
         else
           error new Error 'No such binary for ' + spec + ': ' + bin +
-                          '. Available: ' + bin_list.join ','
+                          '. Available: ' + bin_list.join ', '
       else if bin_list.length is 1
         console.log binaries[bin_list[0]]
       else
         error new Error 'Multiple binaries are available for ' + spec + ': ' +
-                        bin_list(',') + '. Please select one.'
+                        bin_list.join ', '
   else
     msg = """
           Invalid command. Usage:

@@ -1,6 +1,6 @@
 {
   "name": "dynmod",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "Node module loader (e.g. replacement for the 'require' command for npm packages) with auto-install support and ability to handle multiple versions",
   "main": "js/dynmod.js",
   "scripts": {

@@ -15,7 +15,8 @@ Handles multiple versions of npm packages, so despite being system-wide, so your
 - Allows your project to install dependencies only when they actually use them.
 
 # Install
-## Global install makes it available for all of your projects plus it makes the command line version available system wide. Requires administrator permissions (sudo).
+## Global install makes it available for all of your projects plus it makes the command line version available system-wide
+### Requires administrator permissions (sudo)
     [sudo] npm install dynmod -g
 ## Local install
     npm install dynmod
@@ -24,56 +25,52 @@ Handles multiple versions of npm packages, so despite being system-wide, so your
 ## Asynchronous
 ### require
 #### Require module(s) - auto-install them as needed
-#### A *spec* is a name of an npm package with optional version specificiation. E.g. 'express' or 'express@3.5.0'
     var dynmod = require('dynmod');
     // Asynchronous:
-    dynmod.**require**('*spec*'[, '*spec2*', ...], function callback(err, module[, module2, ...]) {});
+    dynmod.require('package[@version]'[, 'package[@version]', ...], function callback(err, module[, module, ...]) {});
     // Synchronous:
-    var module = dynmod.**require**('*spec*');
-    var modules_array = dynmod.**require**('*spec1*'[, '*spec2*', ...]);
+    var module = dynmod.require('package[@version]');
+    var modules_array = dynmod.require('package[@version]'[, 'package[@version]', ...]);
     // Will also work with just calling dynmod (e.g. not 'dynmod.require') :
-    dynmod('*spec*', function callback(err, module) {}); // short asynchronous require
-    var module = dynmod('*spec*'); // short synchronous require
+    dynmod('package[@version]', function callback(err, module) {}); // short asynchronous require
+    var module = dynmod('package[@version]'); // short synchronous require
 
 ### list
 #### Get locally installed version(s) of a module(s)
-#### A *package* is a name of an npm package. E.g. 'express'
     var dynmod = require('dynmod');
     // Asynchronous:
-    dynmod.**list**('*package*', function callback(err, versions) {});
-    dynmod.**list**(['*package1*', '*package2*'], function callback(err, versions_per_packages_dictionary) {});
+    dynmod.list('package', function callback(err, versions) {});
+    dynmod.list(['package', 'package', ...], function callback(err, versions_per_packages_dictionary) {});
     // Synchronous:
-    var versions = dynmod.**list**('*package*');
-    var versions_per_packages_dictionary = dynmod.**list**(['*package1*', '*package2*']);
+    var versions = dynmod.list('package');
+    var versions_per_packages_dictionary = dynmod.list(['package', 'package', ...]);
 
 ### install
 #### Install module(s) locally
-#### A *spec* is a name of an npm package with optional version specificiation. E.g. 'express' or 'express@3.5.0'
     var dynmod = require('dynmod');
     // Asynchronous:
-    dynmod.**install**('*spec*'[, '*spec2*', ...], function callback(err, version[, version2, ...]) {});
+    dynmod.install('package[@version]'[, 'package[@version]', ...], function callback(err, version[, version, ...]) {});
     // Synchronous:
-    var version = dynmod.**install**('*spec*');
-    var versions_array = dynmod.**install**('*spec1*', '*spec2*'[, ...]);
+    var version = dynmod.install('package[@version]');
+    var versions_array = dynmod.install('package[@version]', 'package[@version]'[, ...]);
 
 ### remove
 #### Remove locally installed modules
-#### A *spec* is a name of an npm package with optional version specificiation. E.g. 'express' or 'express@3.5.0'
     var dynmod = require('dynmod');
     // Asynchronous:
-    dynmod.**remove**('*spec*'[, '*spec2*', ...], function callback(err) {});
+    dynmod.remove('package[@version]'[, 'package[@version]', ...], function callback(err) {});
     // Synchronous:
-    dynmod.**remove**('*spec*'[, '*spec2*', ...]);
+    dynmod.remove('package[@version]'[, 'package[@version]', ...]);
 
 ## Command line examples
 ### Install
-    dynmod install *spec* [*spec2* ...]
+    dynmod install package[@version] [package[@version] ...]
 
 ### Remove
-    dynmod remove *spec* [*spec2* ...]
+    dynmod remove package[@version] [package[@version] ...]
 
 ### List
-    dynmod list [*package* *package2* ...]
+    dynmod list [package package ...]
 
 ### Run binary
-    dynmod-run *spec* [binary-name]
+    dynmod-run package[@version] [binary-name]

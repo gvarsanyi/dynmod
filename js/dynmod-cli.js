@@ -105,12 +105,12 @@
           if (binaries[bin] != null) {
             return console.log(binaries[bin]);
           } else {
-            return error(new Error('No such binary for ' + spec + ': ' + bin + '. Available: ' + bin_list.join(',')));
+            return error(new Error('No such binary for ' + spec + ': ' + bin + '. Available: ' + bin_list.join(', ')));
           }
         } else if (bin_list.length === 1) {
           return console.log(binaries[bin_list[0]]);
         } else {
-          return error(new Error('Multiple binaries are available for ' + spec + ': ' + bin_list(',') + '. Please select one.'));
+          return error(new Error('Multiple binaries are available for ' + spec + ': ' + bin_list.join(', ')));
         }
       });
       break;
