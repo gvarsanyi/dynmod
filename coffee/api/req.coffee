@@ -11,60 +11,100 @@ err_msg = '%s is partially installed (possibly being installed by an other pr' +
           'ocess?). If you are sure this is a failed installation, use requir' +
           'e(\'dynmod\').remove(\'%s\'); to remove it.'
 
+async = (specs, callback) ->
+  return callback(new Error 'A module name is required') unless specs.length
 
-module.exports = (spec, callback) ->
-  [pkg, version] = spec.split '@'
+  errors  = []
+  modules = {}
+  count   = 0
+  total   = specs.length
 
-  if mod = cache.pkg[pkg]?[version or currents[pkg]]?
-    return callback null, mod
+  read_spec = (spec) ->
+    modules[spec] = null
 
-  read = ->
-    try
-      path = dir + '/' + pkg + '/' + version + '/node_modules/' + pkg
-      mod = require path
-      (cache.pkg[pkg] ?= {})[version] = mod
-      callback null, mod
-    catch err
-      callback err
+    conclude = (err, mod) ->
+      count += 1
+      errors.push(err) if err
+      modules[spec] = mod
 
-  verify_version = ->
-    fs.exists dir + '/' + pkg + '/' + version + '/.dynmod-proper', (exists) ->
-      return read() if exists
-      return callback new Error util.format err_msg, spec, spec
+      if count >= total
+        response = []
+        response.push(mod) for spec, mod of modules
+        if errors.length is 1
+          callback errors[0], response...
+        else if errors.length > 1
+          callback errors, response...
+        else
+          callback null, response...
 
-  list pkg, (err, versions) ->
-    unless version
-      return callback(err) if err
-      if versions and versions.length > 0
-        version = versions.pop()
+    [pkg, version] = spec.split '@'
+
+    if (mod = cache.pkg[pkg]?[version or cache.current[pkg]])?
+      return conclude null, mod
+
+    read = ->
+      try
+        path = dir + '/' + pkg + '/' + version + '/node_modules/' + pkg
+        mod = require path
+        (cache.pkg[pkg] ?= {})[version] = mod
+        conclude null, mod
+      catch err
+        conclude err
+
+    verify_version = ->
+      fs.exists dir + '/' + pkg + '/' + version + '/.dynmod-proper', (exists) ->
+        return read() if exists
+        return conclude new Error util.format err_msg, spec, spec
+
+    list pkg, (err, versions) ->
+      unless version
+        return conclude(err) if err
+        if versions and versions.length > 0
+          version = versions.pop()
+          verify_version()
+        else
+          install pkg, (err, _version) ->
+            return conclude(err) if err
+            version = _version
+            verify_version()
+      else if version in versions
         verify_version()
       else
-        install pkg, (err, _version) ->
-          return callback(err) if err
-          version = _version
+        install spec, (err) ->
+          return conclude(err) if err
           verify_version()
-    else if version in versions
-      verify_version()
-    else
-      install spec, (err) ->
-        return callback(err) if err
-        verify_version()
 
-module.exports.sync = (spec) ->
-  [pkg, version] = spec.split '@'
+  read_spec(spec) for spec in specs
 
-  return mod if mod = cache.pkg[pkg]?[version or currents[pkg]]?
+sync = (specs) ->
+  throw new Error('A module name is required') unless specs.length
+  modules = []
 
-  versions = list.sync pkg
-  unless version
-    if versions and versions.length
-      version = versions.pop()
-    else
-      version = install.sync pkg
-  else unless versions and versions.length and version in versions
-    install.sync spec
+  for spec in specs
+    [pkg, version] = spec.split '@'
 
-  unless fs.existsSync dir + '/' + pkg + '/' + version + '/.dynmod-proper'
-    throw new Error util.format err_msg, spec, spec
-  path = dir + '/' + pkg + '/' + version + '/node_modules/' + pkg
-  require path
+    return mod if mod = cache.pkg[pkg]?[version or cache.current[pkg]]?
+
+    versions = list pkg
+    unless version
+      if versions and versions.length
+        version = versions.pop()
+      else
+        version = install pkg
+    else unless versions and versions.length and version in versions
+      install spec
+
+    unless fs.existsSync dir + '/' + pkg + '/' + version + '/.dynmod-proper'
+      throw new Error util.format err_msg, spec, spec
+    path = dir + '/' + pkg + '/' + version + '/node_modules/' + pkg
+    modules.push require path
+  return modules[0] if specs.length is 1
+  modules
+
+module.exports = (args...) ->
+  if args.length is 0 or typeof args[args.length - 1] isnt 'function'
+    return sync args
+
+  callback = args.pop()
+  async args, callback
+  null

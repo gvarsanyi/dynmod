@@ -1,7 +1,7 @@
 {
   "name": "dynmod",
-  "version": "0.5.0",
-  "description": "Asynchronous npm module loader (e.g. async replacement for the 'require' command for npm packages) with auto-install support",
+  "version": "0.6.0",
+  "description": "Node module loader (e.g. replacement for the 'require' command for npm packages) with auto-install support and ability to handle multiple versions",
   "main": "js/dynmod.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -20,6 +20,8 @@
     "async",
     "asynchronous",
     "require",
+    "multiple",
+    "multi",
     "npm",
     "package",
     "autoinstall",

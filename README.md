@@ -22,43 +22,51 @@ Handles multiple versions of npm packages, so despite being system-wide, so your
 
 # API
 ## Asynchronous
-- require('dynmod').**require**(npm_module_name, function callback(err, module) {});
-- require('dynmod').**remove**(npm_module_name, function callback(err) {});
-- require('dynmod').**list**([npm_module_name, ]function callback(err, versions) {});
-## Synchronous
-- var mod = require('dynmod').**require.sync**(npm_module_name);
-- var mod = require('dynmod').**remove.sync**(npm_module_name);
-- var mod = require('dynmod').**list.sync**([npm_module_name]);
-
-# Examples
-## Code requires latest (or most current locally installed version) of ExpressJS - asynchronous
+### require
+Require module - after installing it if needed. A *spec* is a name of an npm package with optional version specificiation. E.g. 'express' or 'express@3.5.0'.
     var dynmod = require('dynmod');
-    dynmod.require('express', function (err, express) {
-      var app = express();
-      // ... my express app logic
-    });
+    // Asynchronous:
+    dynmod.**require**('*spec*'[, '*spec2*', ...], function callback(err, module[, module2, ...]) {});
+    // Synchronous:
+    var module = dynmod.**require**('*spec*');
+    var modules_array = dynmod.**require**('*spec1*'[, '*spec2*', ...]);
+    // Will also work with just calling dynmod (e.g. not 'dynmod.require') :
+    dynmod('*spec*', function callback(err, module) {}); // short asynchronous require
+    var module = dynmod('*spec*'); // short synchronous require
 
-## Code requires a specific version of ExpressJS - asynchronous
+### list
+List locally installed versions of a module or modules. A *package* is a name of an npm package. E.g. 'express'.
     var dynmod = require('dynmod');
-    dynmod.require('express@3.5.0', function (err, express) {
-      var app = express();
-      // ... my express app logic
-    });
+    // Asynchronous:
+    dynmod.**list**('*package*', function callback(err, versions) {});
+    dynmod.**list**(['*package1*', '*package2*'], function callback(err, versions_per_packages_dictionary) {});
+    // Synchronous:
+    var versions = dynmod.**list**('*package*');
+    var versions_per_packages_dictionary = dynmod.**list**(['*package1*', '*package2*']);
 
-## Code requires a specific version of ExpressJS - synchronous
-    var dynmod = require('dynmod')
-      , express = dynmod.require('express@3.5.0')
-      , app = express();
+### install
+Install modules locally. A *spec* is a name of an npm package with optional version specificiation. E.g. 'express' or 'express@3.5.0'.
+    var dynmod = require('dynmod');
+    // Asynchronous:
+    dynmod.**install**('*spec*'[, '*spec2*', ...], function callback(err, version[, version2, ...]) {});
+    // Synchronous:
+    var version = dynmod.**install**('*spec*');
+    var versions_array = dynmod.**install**('*spec1*', '*spec2*'[, ...]);
+
+### remove
+Remove locally installed modules. A *spec* is a name of an npm package with optional version specificiation. E.g. 'express' or 'express@3.5.0'.
+    var dynmod = require('dynmod');
+    // Asynchronous:
+    dynmod.**remove**('*spec*'[, '*spec2*', ...], function callback(err) {});
+    // Synchronous:
+    dynmod.**remove**('*spec*'[, '*spec2*', ...]);
 
 ## Command line examples
-### Install latest version of express
-    dynmod install express
+### Install
+    dynmod install *spec* [*spec2* ...]
 
-### Install a specific version of express
-    dynmod install express@3.5.0
+### Remove
+    dynmod remove *spec* [*spec2* ...]
 
-### Remove an installed version of express
-    dynmod remove express@3.5.0
-
-### List installed versions of express
-    dynmod list express
+### List
+    dynmod list [*spec* *spec2* ...]
