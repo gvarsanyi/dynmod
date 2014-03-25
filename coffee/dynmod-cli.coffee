@@ -1,6 +1,9 @@
 #!/usr/bin/env coffee
 
+child_process = require 'child_process'
+
 dynmod = require './dynmod'
+
 
 error = (err) ->
   if Array.isArray err
@@ -33,8 +36,32 @@ switch process.argv[2]
     dynmod.current pkgs..., (err, versions...) ->
       for pkg, i in pkgs
         console.log pkg + ': ' + (versions[i] or '-')
+  when 'bin', 'r', 'run'
+    [spec, bin] = process.argv[3 .. 4]
+    dynmod.bin spec, (err, binaries) ->
+      return error(err) if err
+      bin_list = []
+      bin_list.push(b) for b, path of binaries
+      if not binaries or bin_list.length is 0
+        error new Error 'No binaries available for ' + spec
+      else if bin
+        if binaries[bin]?
+          console.log binaries[bin]
+        else
+          error new Error 'No such binary for ' + spec + ': ' + bin +
+                          '. Available: ' + bin_list.join ','
+      else if bin_list.length is 1
+        console.log binaries[bin_list[0]]
+      else
+        error new Error 'Multiple binaries are available for ' + spec + ': ' +
+                        bin_list(',') + '. Please select one.'
   else
-    error new Error 'Invalid command. Usage:\n' +
-                    '\ndynmod [command] module[@version]\n\n' +
-                    'Commands: install (i), remove (rm, del, delete), list ' +
-                    '(ls, ll)\n'
+    msg = """
+          Invalid command. Usage:
+
+          dynmod install module[@version]
+          dynmod remove module[@version]
+          dynmod list module
+          dynmod run module[@version] [binary-name]
+          """
+    error new Error msg

@@ -10,6 +10,8 @@
 
   module.exports.install = require('./api/install');
 
+  module.exports.bin = require('./api/bin');
+
   module.exports.list = require('./api/list');
 
   module.exports.current = require('./api/current');
