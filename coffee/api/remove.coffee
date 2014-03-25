@@ -6,41 +6,76 @@ cache = require '../cache'
 dir   = require '../dir'
 
 
-common = (spec) ->
-  [pkg, version] = spec.split '@'
+async = (specs, callback) ->
+  return callback(new Error 'A module name is required') unless specs.length
 
-  console.log '[dynmod] removing ' + spec
-  if version
-    delete cache.pkg[pkg][version] if cache.pkg[pkg]?
-    rm_dir = dir + '/' + pkg + '/' + version
-  else
-    delete cache.pkg[pkg]
-    rm_dir = dir + '/' + pkg
+  errors = []
+  count  = 0
+  total  = specs.length
 
-  [pkg, version, rm_dir]
+  read_spec = (spec) ->
+    conclude = (err, mod) ->
+      count += 1
+      errors.push(err) if err
 
-
-module.exports = (spec, callback) ->
-  [pkg, version, rm_dir] = common spec
-  fs.exists rm_dir, (exists) ->
-    return callback(new Error spec + ' is not installed') unless exists
-    child_process.exec 'rm -rf ' + rm_dir, (err) ->
-      return callback(err) if err
-      return callback() unless version
-      fs.readdir dir + '/' + pkg, (err, files) ->
-        return callback() if err or (files and files.length)
-        child_process.exec 'rm -rf ' + dir + '/' + pkg, (err) ->
+      if count >= total
+        if errors.length is 1
+          callback errors[0]
+        else if errors.length > 1
+          callback errors
+        else
           callback()
 
-module.exports.sync = (spec) ->
-  [pkg, version, rm_dir] = common spec
+    [pkg, version] = spec.split '@'
 
-  throw new Error(spec + ' is not installed') unless fs.existsSync rm_dir
+    console.log '[dynmod] removing ' + spec
+    if version
+      delete cache.pkg[pkg][version] if cache.pkg[pkg]?
+      rm_dir = dir + '/' + pkg + '/' + version
+    else
+      delete cache.pkg[pkg]
+      rm_dir = dir + '/' + pkg
 
-  exec_sync 'rm -rf ' + rm_dir
-  return true unless version
+    fs.exists rm_dir, (exists) ->
+      return conclude(new Error spec + ' is not installed') unless exists
+      child_process.exec 'rm -rf ' + rm_dir, (err) ->
+        return conclude(err) if err
+        return conclude() unless version
+        fs.readdir dir + '/' + pkg, (err, files) ->
+          return conclude() if err or (files and files.length)
+          child_process.exec 'rm -rf ' + dir + '/' + pkg, (err) ->
+            conclude()
 
-  files = fs.readdirSync dir + '/' + pkg
-  unless files and files.length
-    exec_sync 'rm -rf ' + dir + '/' + pkg
+  read_spec(spec) for spec in specs
+
+sync = (specs) ->
+  throw new Error('A module name is required') unless specs.length
+
+  for spec in specs
+    [pkg, version] = spec.split '@'
+
+    console.log '[dynmod] removing ' + spec
+    if version
+      delete cache.pkg[pkg][version] if cache.pkg[pkg]?
+      rm_dir = dir + '/' + pkg + '/' + version
+    else
+      delete cache.pkg[pkg]
+      rm_dir = dir + '/' + pkg
+
+    throw new Error(spec + ' is not installed') unless fs.existsSync rm_dir
+
+    exec_sync 'rm -rf ' + rm_dir
+    return true unless version
+
+    files = fs.readdirSync dir + '/' + pkg
+    unless files and files.length
+      exec_sync 'rm -rf ' + dir + '/' + pkg
   true
+
+module.exports = (args...) ->
+  if args.length is 0 or typeof args[args.length - 1] isnt 'function'
+    return sync args
+
+  callback = args.pop()
+  async args, callback
+  null

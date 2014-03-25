@@ -39,7 +39,6 @@ async = (specs, callback) ->
 
     install = ->
       list pkg, (err, versions) ->
-        return conclude(err) if err
         if versions and versions.length and version in versions
           msg = pkg + '@' + version + ' is already installed'
           return conclude new Error(msg), version
@@ -88,9 +87,8 @@ sync = (specs) ->
     {status, stdout, stderr} = exec_sync 'mkdir -p ' + pkg_dir
     throw new Error(stderr) if status
 
-    cmd = 'cd ' + pkg_dir + '; npm install ' + pkg + '@' + version + ' 2>1 ' +
-          '| grep -v "npm http "'
-    {status, stdout, stderr} = exec_sync cmd
+    cmd = 'npm install ' + pkg + '@' + version + ' 2>1 | grep -v "npm http "'
+    {status, stdout, stderr} = exec_sync cmd, cwd: pkg_dir
     try
       throw new Error(stderr) if status
       path = dir + '/' + pkg + '/' + version + '/.dynmod-proper'
@@ -98,7 +96,7 @@ sync = (specs) ->
     catch err
       console.log '[dynmod] failed to install ' + pkg + '@' + version +
                   ' -- cleaning up'
-      remove.sync spec
+      remove spec
       throw new Error err
 
     delete cache.current[pkg]

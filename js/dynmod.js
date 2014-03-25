@@ -2,15 +2,15 @@
 (function() {
   var req;
 
-  module.exports = req = require('./api/req');
+  req = require('./api/req');
+
+  module.exports = req;
 
   module.exports.require = req;
 
   module.exports.install = require('./api/install');
 
   module.exports.list = require('./api/list');
-
-  module.exports.listAll = require('./api/list-all');
 
   module.exports.current = require('./api/current');
 

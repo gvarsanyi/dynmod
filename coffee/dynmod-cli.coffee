@@ -16,7 +16,7 @@ switch process.argv[2]
       return error(err) if err
   when 'del', 'delete', 'rm', 'remove'
     pkgs = process.argv[3...]
-    dynmod.remove pkg..., (err) ->
+    dynmod.remove pkgs..., (err) ->
       return error(err) if err
   when 'll', 'ls', 'list'
     pkgs = process.argv[3...]
