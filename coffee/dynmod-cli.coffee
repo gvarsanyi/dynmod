@@ -1,7 +1,5 @@
 #!/usr/bin/env coffee
 
-child_process = require 'child_process'
-
 dynmod = require './dynmod'
 
 
@@ -24,7 +22,6 @@ switch process.argv[2]
   when 'll', 'ls', 'list'
     pkgs = process.argv[3...]
     dynmod.list pkgs..., (err, versions) ->
-      console.log err, versions
       if versions
         if pkgs.length isnt 1
           console.log(pkg + ': ' + vers.join ', ') for pkg, vers of versions

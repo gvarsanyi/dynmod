@@ -73,4 +73,5 @@ Handles multiple versions of npm packages, so despite being system-wide, so your
     dynmod list [package package ...]
 
 ### Run binary
-    dynmod-run package[@version] [binary-name]
+    Binary name is required in case the package has multiple binaries
+    dynmod-run package[@version][:binary-name] [argument1 argument2 ...]
